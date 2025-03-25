@@ -23,7 +23,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.sidebar.image("./images/logo.png", width=300)
+st.sidebar.image("logo.png", width=300)
 
 with st.sidebar:
     menu = option_menu(
