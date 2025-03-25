@@ -41,18 +41,34 @@ with st.sidebar:
         }
     )
 
+import pandas as pd
+import streamlit as st
+import requests
+from io import BytesIO
+
 if menu == 'Home':
-    # Função para carregar e filtrar os dados do Excel
-    @st.cache_data
+    # Função para carregar e filtrar os dados do Excel a partir de uma URL
     def load_data():
+        url = "https://geominasbrasil-my.sharepoint.com/:x:/g/personal/romulo_miranda_geominasgeo_com_br/ETrdT-PMxT9DlbboCaM0O4cBvh8cuzDHymHO_qUrMzGo2g?download=1"
+        
+        # Baixa o arquivo do SharePoint
+        response = requests.get(url)
+        if response.status_code != 200:
+            st.error("Erro ao baixar o arquivo. Verifique o link e as permissões de acesso.")
+            return None
+        
+        # Lê o arquivo em memória
         df_geral = pd.read_excel(
-            io='data.xlsx',  # Caminho do arquivo Excel
+            io=BytesIO(response.content),  # Converte o conteúdo baixado em um objeto de Bytes
             dtype=str,  # Garante que os dados sejam strings
             engine='openpyxl',  # Usa a biblioteca openpyxl
             sheet_name='Planilha1',
-            usecols='A:X',  # Seleciona as colunas A até XS
+            usecols='A:X',  # Seleciona as colunas A até X
             nrows=4400  # Limita a quantidade de linhas lidas
         )
+        return df_geral
+
+
 
         # Remover espaços extras nas colunas 'STATUS' e 'TIPO DE MANUTENÇÃO'
         df_geral['STATUS'] = df_geral['STATUS'].str.strip()
@@ -72,6 +88,20 @@ if menu == 'Home':
         ]
 
         return df_filtrado
+    
+
+    # Botão de atualização instantânea
+    #if st.button('Atualizar Dados'):
+     #   df_geral = load_data()
+      #  if df_geral is not None:
+       #     st.write("Dados atualizados com sucesso!")
+        #    st.dataframe(df_geral)  # Exibe os dados na interface
+        #else:
+         #   st.write("Falha ao carregar os dados.")
+        
+
+
+        
 
     # Carregando os dados
     df_filtrado = load_data()
